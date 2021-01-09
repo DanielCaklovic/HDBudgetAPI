@@ -1,0 +1,53 @@
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout Github Action' 
+      uses: actions/checkout@master
+    
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: hdbudgetapicontainerregistry.azurecr.io
+        username: ${{ secrets.acr_hdbudgetapicontainerregistry_username }}
+        password: ${{ secrets.acr_hdbudgetapicontainerregistry_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/HDBudgetAPI" -f  "HDBudgetAPI/Dockerfile" -t hdbudgetapicontainerregistry.azurecr.io/hdbudgetapi-img:${{ github.sha }}
+        docker push hdbudgetapicontainerregistry.azurecr.io/hdbudgetapi-img:${{ github.sha }}
+
+    - name: Set Web App ACR authentication
+      uses: Azure/appservice-settings@v1
+      with: 
+        app-name: HDBudgetAPI
+        app-settings-json: | 
+          [
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "hdbudgetapicontainerregistry.azurecr.io",
+              "slotSetting": false
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": "${{ secrets.acr_hdbudgetapicontainerregistry_username }}",
+              "slotSetting": false
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": "${{ secrets.acr_hdbudgetapicontainerregistry_password }}",
+              "slotSetting": false
+            }            
+          ]
+      
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: HDBudgetAPI
+        images: hdbudgetapicontainerregistry.azurecr.io/hdbudgetapi-img:${{ github.sha }}
