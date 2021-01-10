@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using HDBudgetAPI.Entities;
+using System;
+using HDBudget.Helpers;
 
 namespace HDBudgetAPI.Helpers
 {

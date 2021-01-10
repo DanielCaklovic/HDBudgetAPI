@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System;
+using HDBudget.Helpers;
 
 namespace HDBudgetAPI
 {
@@ -27,11 +28,13 @@ namespace HDBudgetAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddDbContextPool<DataContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+
+
 
             services.AddCors();
             services.AddControllers();
@@ -56,7 +59,7 @@ namespace HDBudgetAPI
                     OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var userId = Guid.Parse(context.Principal.Identity.Name);
                         var user = userService.GetById(userId);
                         if (user == null)
                         {
@@ -85,8 +88,7 @@ namespace HDBudgetAPI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext dataContext)
         {
             // migrate any database changes on startup (includes initial db creation)
-            dataContext.Database.Migrate();
-
+            DatabaseInitializer.Initialize(dataContext);
             app.UseRouting();
 
             // global cors policy

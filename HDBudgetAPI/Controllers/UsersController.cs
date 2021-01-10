@@ -15,7 +15,7 @@ using HDBudgetAPI.Models.Users;
 
 namespace HDBudgetAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UsersController : ControllerBase
@@ -97,7 +97,7 @@ namespace HDBudgetAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetById(Guid id)
         {
             var user = _userService.GetById(id);
             var model = _mapper.Map<UserModel>(user);
@@ -105,7 +105,7 @@ namespace HDBudgetAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UpdateModel model)
+        public IActionResult Update(Guid id, [FromBody]UpdateModel model)
         {
             // map model to entity and set id
             var user = _mapper.Map<User>(model);
@@ -125,7 +125,7 @@ namespace HDBudgetAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             _userService.Delete(id);
             return Ok();

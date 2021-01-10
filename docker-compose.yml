@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  hdbudgetapi:
+    image: ${DOCKER_REGISTRY-}hdbudgetapi
+    build:
+      context: .
+      dockerfile: HDBudgetAPI/Dockerfile
+    ports:
+      - 5001:80
+    links:
+      - database_psql
+    depends_on:
+      - "database_psql"
+    networks:
+      - mynetwork
+
+  database_psql:
+    container_name: database_postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+volumes:
+  pgdata:
+#must add network bridge in order to access it from localhost
+networks:
+  mynetwork:
+     driver: bridge
