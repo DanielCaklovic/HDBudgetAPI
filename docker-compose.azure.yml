@@ -3,12 +3,9 @@ version: '3.7'
 services:
   hdbudgetapi:
     container_name: 'hdbudgetapi'
-    image: 'hdbudgetapi'
-    build:
-        context: .
-        dockerfile: HDBudgetAPI/Dockerfile
+    image: 'evildaniel2000/hdbudgetapi'
     ports:
-      - 5001:80
+      - 80:5000
     depends_on:
       - "postgres"
     networks:

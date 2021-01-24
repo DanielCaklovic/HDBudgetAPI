@@ -19,7 +19,7 @@ namespace HDBudget.Helpers
         /// <param name="context">The context.</param>
         public static void Initialize(DataContext context)
         {
-            context.Database.EnsureCreated();
+            context.Database.Migrate();
 
             var testUser = new User()
             {

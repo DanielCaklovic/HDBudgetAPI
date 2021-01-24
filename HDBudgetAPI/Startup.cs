@@ -28,12 +28,19 @@ namespace HDBudgetAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContextPool<DataContext>(options =>
+            services.AddEntityFrameworkNpgsql().AddDbContext<DataContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //services.AddDbContextPool<DataContext>(options =>
+            //{
+            //    options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+            //});
 
+            //services.AddEntityFrameworkNpgsql()
+            //    .AddDbContext<DockerCommandsDbContext>(options =>
+            //        options.UseNpgsql(Configuration["Data:DbContext:DockerCommandsConnectionString"]))
 
 
             services.AddCors();
